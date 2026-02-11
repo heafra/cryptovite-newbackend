@@ -1,13 +1,17 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
-// Create a new pool using DATABASE_URL from Railway environment variables
+// Use Railway's auto-generated service variables for Postgres
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // needed for Railway Postgres
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  ssl: { rejectUnauthorized: false } // required for Railway Postgres
 });
 
-// Helper function to run queries safely
+// Helper function to run queries
 export async function query(text, params) {
   const client = await pool.connect();
   try {
@@ -18,7 +22,7 @@ export async function query(text, params) {
   }
 }
 
-// Optional: Test the connection when the module is loaded
+// Optional: test the connection when module loads
 (async () => {
   try {
     const res = await pool.query('SELECT NOW()');
